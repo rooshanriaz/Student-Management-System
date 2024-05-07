@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional CSS styles for teacher page */
+        .section {
+            margin-bottom: 30px;
+        }
+        .attendance-record {
+            margin-bottom: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, Teacher!</h1>
+        <div class="section">
+            <h2>Give Grades</h2>
+            <form id="gradeForm">
+                <label for="student">Student:</label>
+                <select id="student" name="student">
+                    <!-- Students will be dynamically added here -->
+                </select><br><br>
+                <label for="grade">Grade:</label>
+                <input type="text" id="grade" name="grade"><br><br>
+                <input type="submit" value="Submit Grade">
+            </form>
+        </div>
+        <div class="section">
+            <h2>Accept Enrollment Requests</h2>
+            <ul id="enrollmentRequests">
+                <!-- Enrollment requests will be dynamically added here -->
+            </ul>
+        </div>
+        <div class="section">
+            <h2>Mark Attendance</h2>
+            <div>
+                <h3>Current Attendance</h3>
+                <form id="attendanceForm">
+                    <label for="studentAttendance">Student:</label>
+                    <select id="studentAttendance" name="studentAttendance">
+                        <!-- Students will be dynamically added here -->
+                    </select><br><br>
+                    <label for="status">Status:</label>
+                    <select id="status" name="status">
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                    </select><br><br>
+                    <input type="submit" value="Submit Attendance">
+                </form>
+            </div>
+            <div>
+                <h3>Past Attendance Records</h3>
+                <div id="attendanceRecords">
+                    <!-- Attendance records will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        // Function to fetch and populate student names in select dropdowns
+        function populateStudentDropdowns() {
+            // Fetch student names from the backend API endpoint
+            // Replace this with actual API endpoint to fetch student names
+            var students = ["John", "Jane", "Doe"];
+
+            // Populate the 'Student' select dropdown in 'Give Grades' section
+            var studentDropdown = document.getElementById('student');
+            students.forEach(function(student) {
+                var option = document.createElement('option');
+                option.value = student;
+                option.textContent = student;
+                studentDropdown.appendChild(option);
+            });
+
+            // Populate the 'Student' select dropdown in 'Mark Attendance' section
+            var studentAttendanceDropdown = document.getElementById('studentAttendance');
+            students.forEach(function(student) {
+                var option = document.createElement('option');
+                option.value = student;
+                option.textContent = student;
+                studentAttendanceDropdown.appendChild(option);
+            });
+        }
+
+        // Call the function to populate student dropdowns
+        populateStudentDropdowns();
+
+        // Function to fetch and display past attendance records
+        function displayAttendanceRecords() {
+            // Fetch past attendance records from the backend API endpoint
+            // Replace this with actual API endpoint to fetch attendance records
+            var attendanceRecords = [
+                { student: "John", date: "2024-05-10", status: "Present" },
+                { student: "Jane", date: "2024-05-10", status: "Absent" },
+                { student: "Doe", date: "2024-05-10", status: "Present" }
+            ];
+
+            var attendanceRecordsContainer = document.getElementById('attendanceRecords');
+            attendanceRecordsContainer.innerHTML = ''; // Clear existing records
+
+            attendanceRecords.forEach(function(record) {
+                var recordElement = document.createElement('div');
+                recordElement.classList.add('attendance-record');
+                recordElement.innerHTML = '<p>Student: ' + record.student + ', Date: ' + record.date + ', Status: ' + record.status + '</p>';
+                attendanceRecordsContainer.appendChild(recordElement);
+            });
+        }
+
+        // Call the function to display past attendance records
+        displayAttendanceRecords();
+
+        // Submit grade form handler
+        document.getElementById('gradeForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+            var student = document.getElementById('student').value;
+            var grade = document.getElementById('grade').value;
+
+            // Perform AJAX request to submit grade to the backend
+            // Replace this with actual AJAX request to your backend API
+            console.log('Submitted grade for ' + student + ': ' + grade);
+        });
+
+        // Submit attendance form handler
+        document.getElementById('attendanceForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+            var student = document.getElementById('studentAttendance').value;
+            var status = document.getElementById('status').value;
+
+            // Perform AJAX request to submit attendance to the backend
+            // Replace this with actual AJAX request to your backend API
+            console.log('Submitted attendance for ' + student + ': ' + status);
+        });
+    </script>
+</body>
+</html>
