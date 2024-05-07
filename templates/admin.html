@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, Admin!</h1>
+        <div class="section">
+            <h2>Manage Users</h2>
+            <form id="manageUsersForm">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username"><br><br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password"><br><br>
+                <label for="role">Role:</label>
+                <select id="role" name="role">
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="admin">Admin</option>
+                </select><br><br>
+                <input type="submit" value="Create User">
+            </form>
+        </div>
+        <div class="section">
+            <h2>Allot Hostels and Room Numbers</h2>
+            <form id="allotHostelForm">
+                <label for="studentName">Student Name:</label>
+                <input type="text" id="studentName" name="studentName"><br><br>
+                <label for="hostel">Hostel:</label>
+                <input type="text" id="hostel" name="hostel"><br><br>
+                <label for="roomNumber">Room Number:</label>
+                <input type="text" id="roomNumber" name="roomNumber"><br><br>
+                <input type="submit" value="Allot Hostel">
+            </form>
+        </div>
+        <div class="section">
+            <h2>Allot Mess Halls</h2>
+            <form id="allotMessHallForm">
+                <label for="studentNameMess">Student Name:</label>
+                <input type="text" id="studentNameMess" name="studentNameMess"><br><br>
+                <label for="messHall">Mess Hall:</label>
+                <input type="text" id="messHall" name="messHall"><br><br>
+                <input type="submit" value="Allot Mess Hall">
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
