@@ -68,19 +68,48 @@
             <form id="insertStudentForm">
                 <label for="studentName">Student Name:</label>
                 <input type="text" id="studentName" name="studentName">
-                <label for="studentID">Student ID:</label>
-                <input type="text" id="studentID" name="studentID">
                 <label for="studentEmail">Student Email:</label>
                 <input type="text" id="studentEmail" name="studentEmail">
+                <label for="studentPassword">Password:</label>
+                <input type="password" id="studentPassword" name="studentPassword">
+                <label for="studentDOB">Date of Birth:</label>
+                <input type="text" id="studentDOB" name="studentDOB">
+                <label for="studentCity">City:</label>
+                <input type="text" id="studentCity" name="studentCity">
+                <label for="studentCNIC">CNIC:</label>
+                <input type="text" id="studentCNIC" name="studentCNIC">
+                <label for="studentRegNumber">Registration Number:</label>
+                <input type="text" id="studentRegNumber" name="studentRegNumber">
+                <label for="studentProgram">Program Name:</label>
+                <input type="text" id="studentProgram" name="studentProgram">
+                <label for="studentCGPA">CGPA:</label>
+                <input type="text" id="studentCGPA" name="studentCGPA">
                 <input type="submit" value="Insert Student">
             </form>
         </div>
         <div class="section">
-            <h2>Delete Student</h2>
-            <form id="deleteStudentForm">
-                <label for="studentEmailDelete">Student Email:</label>
-                <input type="text" id="studentEmailDelete" name="studentEmailDelete">
-                <input type="submit" value="Delete Student">
+            <h2>Update Student Data</h2>
+            <form id="updateStudentForm">
+                <label for="updateStudentEmail">Student Email:</label>
+                <input type="text" id="updateStudentEmail" name="updateStudentEmail">
+                <!-- Add fields to update student data -->
+                <label for="updateStudentName">New Student Name:</label>
+                <input type="text" id="updateStudentName" name="updateStudentName">
+                <label for="updateStudentPassword">New Password:</label>
+                <input type="password" id="updateStudentPassword" name="updateStudentPassword">
+                <label for="updateStudentDOB">New Date of Birth:</label>
+                <input type="text" id="updateStudentDOB" name="updateStudentDOB">
+                <label for="updateStudentCity">New City:</label>
+                <input type="text" id="updateStudentCity" name="updateStudentCity">
+                <label for="updateStudentCNIC">New CNIC:</label>
+                <input type="text" id="updateStudentCNIC" name="updateStudentCNIC">
+                <label for="updateStudentRegNumber">New Registration Number:</label>
+                <input type="text" id="updateStudentRegNumber" name="updateStudentRegNumber">
+                <label for="updateStudentProgram">New Program Name:</label>
+                <input type="text" id="updateStudentProgram" name="updateStudentProgram">
+                <label for="updateStudentCGPA">New CGPA:</label>
+                <input type="text" id="updateStudentCGPA" name="updateStudentCGPA">
+                <input type="submit" value="Update Student Data">
             </form>
         </div>
         <div class="section">
@@ -101,6 +130,19 @@
                 <label for="teacherEmailDelete">Teacher Email:</label>
                 <input type="text" id="teacherEmailDelete" name="teacherEmailDelete">
                 <input type="submit" value="Delete Teacher">
+            </form>
+        </div>
+        <div class="section">
+            <h2>Update Teacher Data</h2>
+            <form id="updateTeacherForm">
+                <label for="updateTeacherEmail">Teacher Email:</label>
+                <input type="text" id="updateTeacherEmail" name="updateTeacherEmail">
+                <!-- Add fields to update teacher data -->
+                <label for="updateTeacherName">New Teacher Name:</label>
+                <input type="text" id="updateTeacherName" name="updateTeacherName">
+                <label for="updateTeacherPosition">New Teacher Position:</label>
+                <input type="text" id="updateTeacherPosition" name="updateTeacherPosition">
+                <input type="submit" value="Update Teacher Data">
             </form>
         </div>
     </div>
