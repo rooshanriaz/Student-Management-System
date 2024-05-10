@@ -1,4 +1,3 @@
-# DBMS-Project
 DBMS Project 
 Requirements:
 	⁃	Project requirements (What the client desires)
