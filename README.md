@@ -1,5 +1,5 @@
-# DBMS-Project
-# Requirements
+DBMS Project 
+Requirements:
 	⁃	Project requirements (What the client desires)
 	⁃	Er diagram
 	⁃	Database Project schema
