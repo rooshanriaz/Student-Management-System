@@ -21,26 +21,46 @@
             width: 80%;
             margin: 20px auto;
             background-color: #fff;
-            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .section {
-            margin-bottom: 20px;
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
         }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
         }
 
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border-top: none;
+        }
+
+        /* Style the input fields */
         input[type="text"],
         input[type="password"],
         input[type="submit"],
         select {
-            width: 100%;
+            width: calc(100% - 20px);
             padding: 8px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
@@ -63,88 +83,75 @@
 <body>
     <div class="container">
         <h1>Welcome, Admin!</h1>
-        <div class="section">
-            <h2>Insert Student</h2>
-            <form id="insertStudentForm">
-                <label for="studentName">Student Name:</label>
-                <input type="text" id="studentName" name="studentName">
-                <label for="studentEmail">Student Email:</label>
-                <input type="text" id="studentEmail" name="studentEmail">
-                <label for="studentPassword">Password:</label>
-                <input type="password" id="studentPassword" name="studentPassword">
-                <label for="studentDOB">Date of Birth:</label>
-                <input type="text" id="studentDOB" name="studentDOB">
-                <label for="studentCity">City:</label>
-                <input type="text" id="studentCity" name="studentCity">
-                <label for="studentCNIC">CNIC:</label>
-                <input type="text" id="studentCNIC" name="studentCNIC">
-                <label for="studentRegNumber">Registration Number:</label>
-                <input type="text" id="studentRegNumber" name="studentRegNumber">
-                <label for="studentProgram">Program Name:</label>
-                <input type="text" id="studentProgram" name="studentProgram">
-                <label for="studentCGPA">CGPA:</label>
-                <input type="text" id="studentCGPA" name="studentCGPA">
-                <input type="submit" value="Insert Student">
-            </form>
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'insert')">Insert</button>
+            <button class="tablinks" onclick="openTab(event, 'delete')">Delete</button>
+            <button class="tablinks" onclick="openTab(event, 'update')">Update</button>
         </div>
-        <div class="section">
-            <h2>Update Student Data</h2>
-            <form id="updateStudentForm">
-                <label for="updateStudentEmail">Student Email:</label>
-                <input type="text" id="updateStudentEmail" name="updateStudentEmail">
-                <!-- Add fields to update student data -->
-                <label for="updateStudentName">New Student Name:</label>
-                <input type="text" id="updateStudentName" name="updateStudentName">
-                <label for="updateStudentPassword">New Password:</label>
-                <input type="password" id="updateStudentPassword" name="updateStudentPassword">
-                <label for="updateStudentDOB">New Date of Birth:</label>
-                <input type="text" id="updateStudentDOB" name="updateStudentDOB">
-                <label for="updateStudentCity">New City:</label>
-                <input type="text" id="updateStudentCity" name="updateStudentCity">
-                <label for="updateStudentCNIC">New CNIC:</label>
-                <input type="text" id="updateStudentCNIC" name="updateStudentCNIC">
-                <label for="updateStudentRegNumber">New Registration Number:</label>
-                <input type="text" id="updateStudentRegNumber" name="updateStudentRegNumber">
-                <label for="updateStudentProgram">New Program Name:</label>
-                <input type="text" id="updateStudentProgram" name="updateStudentProgram">
-                <label for="updateStudentCGPA">New CGPA:</label>
-                <input type="text" id="updateStudentCGPA" name="updateStudentCGPA">
-                <input type="submit" value="Update Student Data">
-            </form>
+
+        <!-- Insert tab content -->
+        <div id="insert" class="tabcontent">
+            <div class="section">
+                <h2>Insert Student</h2>
+                <form id="insertStudentForm">
+                    <!-- Student insertion form fields -->
+                </form>
+            </div>
+            <div class="section">
+                <h2>Insert Teacher</h2>
+                <form id="insertTeacherForm">
+                    <!-- Teacher insertion form fields -->
+                </form>
+            </div>
         </div>
-        <div class="section">
-            <h2>Insert Teacher</h2>
-            <form id="insertTeacherForm">
-                <label for="teacherName">Teacher Name:</label>
-                <input type="text" id="teacherName" name="teacherName">
-                <label for="teacherEmail">Teacher Email:</label>
-                <input type="text" id="teacherEmail" name="teacherEmail">
-                <label for="teacherPosition">Teacher Position:</label>
-                <input type="text" id="teacherPosition" name="teacherPosition">
-                <input type="submit" value="Insert Teacher">
-            </form>
+
+        <!-- Delete tab content -->
+        <div id="delete" class="tabcontent">
+            <div class="section">
+                <h2>Delete Student</h2>
+                <form id="deleteStudentForm">
+                    <!-- Student deletion form fields -->
+                </form>
+            </div>
+            <div class="section">
+                <h2>Delete Teacher</h2>
+                <form id="deleteTeacherForm">
+                    <!-- Teacher deletion form fields -->
+                </form>
+            </div>
         </div>
-        <div class="section">
-            <h2>Delete Teacher</h2>
-            <form id="deleteTeacherForm">
-                <label for="teacherEmailDelete">Teacher Email:</label>
-                <input type="text" id="teacherEmailDelete" name="teacherEmailDelete">
-                <input type="submit" value="Delete Teacher">
-            </form>
-        </div>
-        <div class="section">
-            <h2>Update Teacher Data</h2>
-            <form id="updateTeacherForm">
-                <label for="updateTeacherEmail">Teacher Email:</label>
-                <input type="text" id="updateTeacherEmail" name="updateTeacherEmail">
-                <!-- Add fields to update teacher data -->
-                <label for="updateTeacherName">New Teacher Name:</label>
-                <input type="text" id="updateTeacherName" name="updateTeacherName">
-                <label for="updateTeacherPosition">New Teacher Position:</label>
-                <input type="text" id="updateTeacherPosition" name="updateTeacherPosition">
-                <input type="submit" value="Update Teacher Data">
-            </form>
+
+        <!-- Update tab content -->
+        <div id="update" class="tabcontent">
+            <div class="section">
+                <h2>Update Student Data</h2>
+                <form id="updateStudentForm">
+                    <!-- Student update form fields -->
+                </form>
+            </div>
+            <div class="section">
+                <h2>Update Teacher Data</h2>
+                <form id="updateTeacherForm">
+                    <!-- Teacher update form fields -->
+                </form>
+            </div>
         </div>
     </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
 </body>
 </html>
