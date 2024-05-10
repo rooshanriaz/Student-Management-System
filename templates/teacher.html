@@ -43,6 +43,19 @@
             background-color: #ddd;
         }
 
+        .logout-button {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #d9534f;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logout-button:hover {
+            background-color: #c9302c;
+        }
+
         table {
             width: 80%;
             margin: 20px auto;
@@ -76,6 +89,7 @@
         <li><a href="/view-students">View Students</a></li>
         <li><a href="/mark-attendance">Mark Attendance</a></li>
         <li><a href="/give-grades">Give Grades</a></li>
+        <li><a href="/logout" class="logout-button">Logout</a></li>
     </ul>
 
     <!-- Table for displaying teacher details -->
@@ -98,40 +112,38 @@
 
     <p id="noDetailsMsg" style="text-align: center; display: none;">No teacher found.</p>
 
-    <!-- Enrolled Students -->
     <!-- Enrolled Students by Course -->
-{% if enrolled_students %}
-<h2>Enrolled Students by Course</h2>
-{% for course_name, students in enrolled_students.items() %}
-<h3>{{ course_name }}</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Student Name</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for student_name in students %}
-        <tr>
-            <td>{{ student_name }}</td>
-            <td>
-                <!-- Form to remove the student -->
-                <form action="/remove-student" method="POST">
-                    <input type="hidden" name="course_name" value="{{ course_name }}">
-                    <input type="hidden" name="student_name" value="{{ student_name }}">
-                    <button type="submit">Remove</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endfor %}
-{% else %}
-<p>No students are currently enrolled in your courses.</p>
-{% endif %}
-
+    {% if enrolled_students %}
+    <h2>Enrolled Students by Course</h2>
+    {% for course_name, students in enrolled_students.items() %}
+    <h3>{{ course_name }}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student_name in students %}
+            <tr>
+                <td>{{ student_name }}</td>
+                <td>
+                    <!-- Form to remove the student -->
+                    <form action="/remove-student" method="POST">
+                        <input type="hidden" name="course_name" value="{{ course_name }}">
+                        <input type="hidden" name="student_name" value="{{ student_name }}">
+                        <button type="submit">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+    {% else %}
+    <p>No students are currently enrolled in your courses.</p>
+    {% endif %}
 
     <script>
         function toggleDetails() {
