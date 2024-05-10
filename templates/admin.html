@@ -4,50 +4,184 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f3f3f3;
+        }
+
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        .logout-button {
+            padding: 10px 20px;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout-button:hover {
+            background-color: #c9302c;
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border-top: none;
+        }
+
+        /* Style the input fields */
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"],
+        select {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome, Admin!</h1>
-        <div class="section">
-            <h2>Manage Users</h2>
-            <form id="manageUsersForm">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username"><br><br>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password"><br><br>
-                <label for="role">Role:</label>
-                <select id="role" name="role">
-                    <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
-                    <option value="admin">Admin</option>
-                </select><br><br>
-                <input type="submit" value="Create User">
-            </form>
+        <div class="header">
+            <h1>Welcome, Admin!</h1>
+            <a href="/logout">
+                <button class="logout-button">Logout</button>
+            </a>
         </div>
-        <div class="section">
-            <h2>Allot Hostels and Room Numbers</h2>
-            <form id="allotHostelForm">
-                <label for="studentName">Student Name:</label>
-                <input type="text" id="studentName" name="studentName"><br><br>
-                <label for="hostel">Hostel:</label>
-                <input type="text" id="hostel" name="hostel"><br><br>
-                <label for="roomNumber">Room Number:</label>
-                <input type="text" id="roomNumber" name="roomNumber"><br><br>
-                <input type="submit" value="Allot Hostel">
-            </form>
+
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'insert')">Insert</button>
+            <button class="tablinks" onclick="openTab(event, 'delete')">Delete</button>
+            <button class="tablinks" onclick="openTab(event, 'update')">Update</button>
         </div>
-        <div class="section">
-            <h2>Allot Mess Halls</h2>
-            <form id="allotMessHallForm">
-                <label for="studentNameMess">Student Name:</label>
-                <input type="text" id="studentNameMess" name="studentNameMess"><br><br>
-                <label for="messHall">Mess Hall:</label>
-                <input type="text" id="messHall" name="messHall"><br><br>
-                <input type="submit" value="Allot Mess Hall">
-            </form>
+
+        <!-- Insert tab content -->
+        <div id="insert" class="tabcontent">
+            <div class="section">
+                <h2>Insert Student</h2>
+                <form id="insertStudentForm">
+                    <!-- Student insertion form fields -->
+                </form>
+            </div>
+            <div class="section">
+                <h2>Insert Teacher</h2>
+                <form id="insertTeacherForm">
+                    <!-- Teacher insertion form fields -->
+                </form>
+            </div>
+        </div>
+
+        <!-- Delete tab content -->
+        <div id="delete" class="tabcontent">
+            <div class="section">
+                <h2>Delete Student</h2>
+                <form id="deleteStudentForm">
+                    <!-- Student deletion form fields -->
+                </form>
+            </div>
+            <div class="section">
+                <h2>Delete Teacher</h2>
+                <form id="deleteTeacherForm">
+                    <!-- Teacher deletion form fields -->
+                </form>
+            </div>
+        </div>
+
+        <!-- Update tab content -->
+        <div id="update" class="tabcontent">
+            <div class="section">
+                <h2>Update Student Data</h2>
+                <form id="updateStudentForm">
+                    <!-- Student update form fields -->
+                </form>
+            </div>
+            <div class="section">
+                <h2>Update Teacher Data</h2>
+                <form id="updateTeacherForm">
+                    <!-- Teacher update form fields -->
+                </form>
+            </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
 </body>
 </html>
