@@ -4,50 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Welcome, Admin!</h1>
         <div class="section">
-            <h2>Manage Users</h2>
-            <form id="manageUsersForm">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username"><br><br>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password"><br><br>
-                <label for="role">Role:</label>
-                <select id="role" name="role">
-                    <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
-                    <option value="admin">Admin</option>
-                </select><br><br>
-                <input type="submit" value="Create User">
-            </form>
-        </div>
-        <div class="section">
-            <h2>Allot Hostels and Room Numbers</h2>
-            <form id="allotHostelForm">
+            <h2>Insert Student</h2>
+            <form id="insertStudentForm">
                 <label for="studentName">Student Name:</label>
-                <input type="text" id="studentName" name="studentName"><br><br>
-                <label for="hostel">Hostel:</label>
-                <input type="text" id="hostel" name="hostel"><br><br>
-                <label for="roomNumber">Room Number:</label>
-                <input type="text" id="roomNumber" name="roomNumber"><br><br>
-                <input type="submit" value="Allot Hostel">
+                <input type="text" id="studentName" name="studentName">
+                <label for="studentID">Student ID:</label>
+                <input type="text" id="studentID" name="studentID">
+                <label for="studentEmail">Student Email:</label>
+                <input type="text" id="studentEmail" name="studentEmail">
+                <input type="submit" value="Insert Student">
             </form>
         </div>
         <div class="section">
-            <h2>Allot Mess Halls</h2>
-            <form id="allotMessHallForm">
-                <label for="studentNameMess">Student Name:</label>
-                <input type="text" id="studentNameMess" name="studentNameMess"><br><br>
-                <label for="messHall">Mess Hall:</label>
-                <input type="text" id="messHall" name="messHall"><br><br>
-                <input type="submit" value="Allot Mess Hall">
+            <h2>Delete Student</h2>
+            <form id="deleteStudentForm">
+                <label for="studentEmailDelete">Student Email:</label>
+                <input type="text" id="studentEmailDelete" name="studentEmailDelete">
+                <input type="submit" value="Delete Student">
+            </form>
+        </div>
+        <div class="section">
+            <h2>Insert Teacher</h2>
+            <form id="insertTeacherForm">
+                <label for="teacherName">Teacher Name:</label>
+                <input type="text" id="teacherName" name="teacherName">
+                <label for="teacherEmail">Teacher Email:</label>
+                <input type="text" id="teacherEmail" name="teacherEmail">
+                <label for="teacherPosition">Teacher Position:</label>
+                <input type="text" id="teacherPosition" name="teacherPosition">
+                <input type="submit" value="Insert Teacher">
+            </form>
+        </div>
+        <div class="section">
+            <h2>Delete Teacher</h2>
+            <form id="deleteTeacherForm">
+                <label for="teacherEmailDelete">Teacher Email:</label>
+                <input type="text" id="teacherEmailDelete" name="teacherEmailDelete">
+                <input type="submit" value="Delete Teacher">
             </form>
         </div>
     </div>
-    <script src="script.js"></script>
 </body>
 </html>
