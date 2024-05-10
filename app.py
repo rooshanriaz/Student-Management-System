@@ -341,6 +341,72 @@ def view_courses():
         return render_template('student.html', registered_courses=registered_courses)
     else:
         return "Email not found in session"
+@app.route('/view-students')
+def view_students():
+    email = session.get('email')
+    
+    if email:
+        cursor = db_connection.cursor()
+        
+        # Retrieve teacher details based on the email
+        cursor.execute("SELECT teacher_name, email, teacher_position FROM Teachers WHERE email = %s", (email,))
+        teacher_data = cursor.fetchone()
+        
+        if teacher_data:
+            # Prepare the teacher details dictionary
+            teacher_details = {
+                'teacher_name': teacher_data[0],
+                'email': teacher_data[1],
+                'teacher_position': teacher_data[2]
+            }
+            
+            # Retrieve students enrolled in courses taught by the teacher
+            cursor.execute(
+                "SELECT s.student_name, r.course_name FROM registrations r "
+                "JOIN Students s ON r.registration_number = s.registration_number "
+                "WHERE r.teacher_name = %s",
+                (teacher_data[0],)
+            )
+            enrolled_students = [{'student_name': row[0], 'course_name': row[1]} for row in cursor.fetchall()]
+            
+            # Pass teacher details and enrolled students to the template
+            return render_template('teacher.html', teacher_details=teacher_details, enrolled_students=enrolled_students)
+        else:
+            return "Teacher details not found."
+    else:
+        return "Email not found in session."
+
+@app.route('/remove-student', methods=['POST'])
+def remove_student():
+    email = session.get('email')
+    
+    if not email:
+        return "Email not found in session"
+
+    # Extract data from the form
+    course_name = request.form['course_name']
+    student_name = request.form['student_name']
+    
+    cursor = db_connection.cursor()
+    
+    # Find the student's registration number
+    cursor.execute("SELECT registration_number FROM Students WHERE student_name = %s", (student_name,))
+    registration_number = cursor.fetchone()
+    
+    if registration_number:
+        registration_number = registration_number[0]
+        
+        # Remove the student from the course in the registrations table
+        cursor.execute(
+            "DELETE FROM registrations WHERE registration_number = %s AND course_name = %s",
+            (registration_number, course_name)
+        )
+        db_connection.commit()
+    else:
+        return f"Student '{student_name}' not found."
+
+    # Redirect back to the students' list page
+    return redirect(url_for('view_students'))
 
 
 @app.route('/student')
@@ -360,18 +426,39 @@ def student():
 
 @app.route('/teacher')
 def teacher():
-    # Retrieve the email from the session or any other source where it's stored
     email = session.get('email')
     
     if email:
-        # Fetch teacher details based on the provided email
-        teacher_details = get_teacher_details(email)
+        cursor = db_connection.cursor()
         
-        # Render the teacher.html template with the retrieved teacher details
-        return render_template('teacher.html', teacher_details=teacher_details)
+        # Retrieve the teacher's details based on their email
+        cursor.execute("SELECT teacher_name, email, teacher_position FROM Teachers WHERE email = %s", (email,))
+        teacher_data = cursor.fetchone()
+        
+        if teacher_data:
+            # Create a dictionary to store the details
+            teacher_details = {
+                'teacher_name': teacher_data[0],
+                'email': teacher_data[1],
+                'teacher_position': teacher_data[2]
+            }
+            
+            # Fetch the students enrolled in the teacher's courses if needed
+            cursor.execute(
+                "SELECT s.student_name, r.course_name FROM registrations r "
+                "JOIN Students s ON r.registration_number = s.registration_number "
+                "WHERE r.teacher_name = %s",
+                (teacher_data[0],)
+            )
+            enrolled_students = [{'student_name': row[0], 'course_name': row[1]} for row in cursor.fetchall()]
+            
+            # Render the teacher.html template and include all necessary data
+            return render_template('teacher.html', teacher_details=teacher_details, enrolled_students=enrolled_students)
+        else:
+            return "Teacher details not found."
     else:
-        # Handle the case where the email is not found
-        return "Email not found"
+        return "Email not found in session."
+
 
 @app.route('/admin')
 def admin():
