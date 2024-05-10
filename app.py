@@ -341,6 +341,7 @@ def view_courses():
         return render_template('student.html', registered_courses=registered_courses)
     else:
         return "Email not found in session"
+    
 @app.route('/view-students')
 def view_students():
     email = session.get('email')
@@ -348,7 +349,7 @@ def view_students():
     if email:
         cursor = db_connection.cursor()
         
-        # Retrieve teacher details based on the email
+        # Retrieve teacher details based on their email
         cursor.execute("SELECT teacher_name, email, teacher_position FROM Teachers WHERE email = %s", (email,))
         teacher_data = cursor.fetchone()
         
@@ -360,21 +361,28 @@ def view_students():
                 'teacher_position': teacher_data[2]
             }
             
-            # Retrieve students enrolled in courses taught by the teacher
-            cursor.execute(
-                "SELECT s.student_name, r.course_name FROM registrations r "
-                "JOIN Students s ON r.registration_number = s.registration_number "
-                "WHERE r.teacher_name = %s",
-                (teacher_data[0],)
-            )
-            enrolled_students = [{'student_name': row[0], 'course_name': row[1]} for row in cursor.fetchall()]
+            # Fetch all courses taught by this teacher
+            cursor.execute("SELECT course_name FROM Course WHERE teacher_name = %s", (teacher_data[0],))
+            courses = [row[0] for row in cursor.fetchall()]
             
-            # Pass teacher details and enrolled students to the template
+            # Prepare a mapping of courses to enrolled students
+            enrolled_students = {}
+            for course_name in courses:
+                cursor.execute(
+                    "SELECT s.student_name FROM registrations r "
+                    "JOIN Students s ON r.registration_number = s.registration_number "
+                    "WHERE r.course_name = %s AND r.teacher_name = %s",
+                    (course_name, teacher_data[0])
+                )
+                enrolled_students[course_name] = [row[0] for row in cursor.fetchall()]
+            
+            # Pass the teacher details and enrolled students dictionary to the template
             return render_template('teacher.html', teacher_details=teacher_details, enrolled_students=enrolled_students)
         else:
             return "Teacher details not found."
     else:
         return "Email not found in session."
+
 
 @app.route('/remove-student', methods=['POST'])
 def remove_student():

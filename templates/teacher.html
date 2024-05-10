@@ -99,36 +99,39 @@
     <p id="noDetailsMsg" style="text-align: center; display: none;">No teacher found.</p>
 
     <!-- Enrolled Students -->
-    {% if enrolled_students %}
-    <h2>Enrolled Students</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Student Name</th>
-                <th>Course Name</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for student in enrolled_students %}
-            <tr>
-                <td>{{ student.student_name }}</td>
-                <td>{{ student.course_name }}</td>
-                <td>
-                    <!-- Form to remove the student -->
-                    <form action="/remove-student" method="POST">
-                        <input type="hidden" name="course_name" value="{{ student.course_name }}">
-                        <input type="hidden" name="student_name" value="{{ student.student_name }}">
-                        <button type="submit">Remove</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>No students are currently enrolled in your courses.</p>
-    {% endif %}
+    <!-- Enrolled Students by Course -->
+{% if enrolled_students %}
+<h2>Enrolled Students by Course</h2>
+{% for course_name, students in enrolled_students.items() %}
+<h3>{{ course_name }}</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student_name in students %}
+        <tr>
+            <td>{{ student_name }}</td>
+            <td>
+                <!-- Form to remove the student -->
+                <form action="/remove-student" method="POST">
+                    <input type="hidden" name="course_name" value="{{ course_name }}">
+                    <input type="hidden" name="student_name" value="{{ student_name }}">
+                    <button type="submit">Remove</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+{% else %}
+<p>No students are currently enrolled in your courses.</p>
+{% endif %}
+
 
     <script>
         function toggleDetails() {
