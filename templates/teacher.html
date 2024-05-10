@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        ul li {
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        ul li a {
+            text-decoration: none;
+            color: #333;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        ul li a:hover {
+            background-color: #ddd;
+        }
+
+        .logout-button {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #d9534f;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logout-button:hover {
+            background-color: #c9302c;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Teacher Details</h1>
+    <ul>
+        <li><a href="#" onclick="toggleDetails()">View My Details</a></li>
+        <li><a href="/view-students">View Students</a></li>
+        <li><a href="/mark-attendance">Mark Attendance</a></li>
+        <li><a href="/give-grades">Give Grades</a></li>
+        <li><a href="/logout" class="logout-button">Logout</a></li>
+    </ul>
+
+    <!-- Table for displaying teacher details -->
+    <table border="1" id="detailsTable" style="display: none;">
+        <tbody>
+            <tr>
+                <th>Name:</th>
+                <td>{{ teacher_details.teacher_name }}</td>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <td>{{ teacher_details.email }}</td>
+            </tr>
+            <tr>
+                <th>Position:</th>
+                <td>{{ teacher_details.teacher_position }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p id="noDetailsMsg" style="text-align: center; display: none;">No teacher found.</p>
+
+    <!-- Enrolled Students by Course -->
+    {% if enrolled_students %}
+    <h2>Enrolled Students by Course</h2>
+    {% for course_name, students in enrolled_students.items() %}
+    <h3>{{ course_name }}</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student_name in students %}
+            <tr>
+                <td>{{ student_name }}</td>
+                <td>
+                    <!-- Form to remove the student -->
+                    <form action="/remove-student" method="POST">
+                        <input type="hidden" name="course_name" value="{{ course_name }}">
+                        <input type="hidden" name="student_name" value="{{ student_name }}">
+                        <button type="submit">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endfor %}
+    {% else %}
+    <p>No students are currently enrolled in your courses.</p>
+    {% endif %}
+
+    <script>
+        function toggleDetails() {
+            var table = document.getElementById("detailsTable");
+            var msg = document.getElementById("noDetailsMsg");
+            if (table.style.display === "none") {
+                table.style.display = "table";
+                msg.style.display = "none";
+            } else {
+                table.style.display = "none";
+                msg.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

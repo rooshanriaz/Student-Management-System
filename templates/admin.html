@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f3f3f3;
+        }
+
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        .logout-button {
+            padding: 10px 20px;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout-button:hover {
+            background-color: #c9302c;
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 20px;
+            border-top: none;
+        }
+
+        /* Style the input fields */
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"],
+        select {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome, Admin!</h1>
+            <a href="/logout">
+                <button class="logout-button">Logout</button>
+            </a>
+        </div>
+
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'insert')">Insert</button>
+            <button class="tablinks" onclick="openTab(event, 'delete')">Delete</button>
+            <button class="tablinks" onclick="openTab(event, 'update')">Update</button>
+        </div>
+
+        <!-- Insert tab content -->
+        <div id="insert" class="tabcontent">
+            <div class="section">
+                <h2>Insert Student</h2>
+                <form id="insertStudentForm">
+                    <!-- Student insertion form fields -->
+                </form>
+            </div>
+            <div class="section">
+                <h2>Insert Teacher</h2>
+                <form id="insertTeacherForm">
+                    <!-- Teacher insertion form fields -->
+                </form>
+            </div>
+        </div>
+
+        <!-- Delete tab content -->
+        <div id="delete" class="tabcontent">
+            <div class="section">
+                <h2>Delete Student</h2>
+                <form id="deleteStudentForm">
+                    <!-- Student deletion form fields -->
+                </form>
+            </div>
+            <div class="section">
+                <h2>Delete Teacher</h2>
+                <form id="deleteTeacherForm">
+                    <!-- Teacher deletion form fields -->
+                </form>
+            </div>
+        </div>
+
+        <!-- Update tab content -->
+        <div id="update" class="tabcontent">
+            <div class="section">
+                <h2>Update Student Data</h2>
+                <form id="updateStudentForm">
+                    <!-- Student update form fields -->
+                </form>
+            </div>
+            <div class="section">
+                <h2>Update Teacher Data</h2>
+                <form id="updateTeacherForm">
+                    <!-- Teacher update form fields -->
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
+</body>
+</html>
