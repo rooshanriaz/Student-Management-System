@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<img src="{{ url_for('static', filename='logo.png') }}">
 <title>Login Page</title>
 <style>
     body {
@@ -21,7 +19,7 @@
         width: 100%;
         padding: 10px;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         align-items: center;
         background-color: #333;
         color: #fff;
@@ -29,9 +27,10 @@
 
     .header img {
         height: 40px;
+        margin-left: auto; /* Pushes the image to the right */
     }
 
-    .contact-us-button {
+    .contact-us-button, .logout-button {
         padding: 10px 20px;
         background-color: #4caf50;
         color: white;
@@ -40,6 +39,10 @@
         cursor: pointer;
         font-size: 16px;
         margin-left: 20px;
+    }
+
+    .logout-button {
+        background-color: #d9534f;
     }
 
     .login-container {
@@ -91,10 +94,12 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ url_for('static', filename='logo.jpg') }}" class="logo">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
         <button class="contact-us-button">Contact Us</button>
+        <a href="/logout">
+            <button class="logout-button">Logout</button>
+        </a>
     </div>
-    
 
     <div class="login-container">
         <h2>Login</h2>
@@ -115,11 +120,5 @@
             <input type="submit" value="Login">
         </form>
     </div>
-
-    <script>
-        function showSignUpForm() {
-            document.getElementById("signUpForm").style.display = "block";
-        }
-    </script>
 </body>
 </html>
