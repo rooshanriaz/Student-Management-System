@@ -137,7 +137,7 @@
             <label for="course">Select Course:</label>
             <select name="course" id="course">
                 {% for course in courses %}
-                <option value="{{ course }}">{{ course }}</option>
+                <option value="{{ course.course_name }}">{{ course.course_name }} ({{ course.teacher_name }})</option>
                 {% endfor %}
             </select>
             <button type="submit">Register</button>
@@ -145,7 +145,7 @@
     </div>
     {% endif %}
 
-    <!-- Display registered courses -->
+    <!-- Registered Courses Section -->
     {% if registered_courses %}
     <div id="registeredCourses">
         <h2>Registered Courses</h2>
@@ -154,7 +154,6 @@
                 <tr>
                     <th>Course Name</th>
                     <th>Teacher Name</th>
-                    <!-- Add more columns if needed -->
                 </tr>
             </thead>
             <tbody>
@@ -162,14 +161,48 @@
                 <tr>
                     <td>{{ course.course_name }}</td>
                     <td>{{ course.teacher_name }}</td>
-                    <!-- Add more columns if needed -->
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% else %}
+    <p>No registered courses found for this student.</p>
     {% endif %}
-        
+
+    {% if registered_courses %}
+<div id="registeredCourses">
+    <h2>Registered Courses</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Course Name</th>
+                <th>Teacher Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in registered_courses %}
+            <tr>
+                <td>{{ course.course_name }}</td>
+                <td>{{ course.teacher_name }}</td>
+                <td>
+                    <!-- Form for unregistering a course -->
+                    <form action="/unregister-course" method="POST">
+                        <input type="hidden" name="course_name" value="{{ course.course_name }}">
+                        <button type="submit">Unregister</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p>No registered courses found for this student.</p>
+{% endif %}
+
+    
     <script>
         function toggleDetails() {
             var table = document.getElementById("detailsTable");

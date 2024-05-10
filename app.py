@@ -204,54 +204,107 @@ def get_course_by_name(course_name):
 def registration_confirmation():
     # Render the registration confirmation page
     return render_template('registration_confirmation.html')
-
 @app.route('/register-courses', methods=['GET', 'POST'])
 def register_courses():
-    # Retrieve the email of the student from the session or any other source
     email = session.get('email')
     
-    if email:
-        if request.method == 'GET':
-            # Fetch the program of the student based on their email
-            student_program = get_student_program(email)
-            
-            if student_program:
-                # Fetch the courses available for the student's program
-                courses = get_courses_by_program(student_program)
-                
-                if courses:
-                    # Render the register-courses.html template with the available courses
-                    return render_template('student.html', courses=courses)
-                else:
-                    return "No courses available for the student's program"
-            else:
-                return "Student program not found for the provided email"
-        elif request.method == 'POST':
-            # Get the selected courses from the form submission
-            selected_course_names = request.form.getlist('course')
-            selected_courses = []
-            
-            # Fetch course objects based on the selected course names
-            for course_name in selected_course_names:
-                course = get_course_by_name(course_name)
-                if course:
-                    selected_courses.append(course)
-            
-            # Register the selected courses for the student
-            register_student_courses(email, selected_courses)
-            
-            # Optionally, redirect the student to a confirmation page
-            return redirect(url_for('registration_confirmation'))
-    else:
+    if not email:
         return "Email not found in session"
+
+    if request.method == 'GET':
+        cursor = db_connection.cursor()
+        cursor.execute("SELECT student_program_name FROM Students WHERE email = %s", (email,))
+        student_program = cursor.fetchone()
+        
+        if student_program:
+            program_name = student_program[0]
+            
+            # Fetch all available courses for this program
+            cursor.execute("SELECT course_name, teacher_name FROM Course WHERE program_name = %s", (program_name,))
+            courses = cursor.fetchall()
+            
+            # Convert to a list of dictionaries
+            courses_dict = [{'course_name': row[0], 'teacher_name': row[1]} for row in courses]
+            
+            # Render the `student.html` template with available courses
+            return render_template('student.html', courses=courses_dict)
+        else:
+            return "Student program not found"
+    
+    elif request.method == 'POST':
+        selected_course_names = request.form.getlist('course')
+        
+        # Fetch the student's registration number
+        cursor = db_connection.cursor()
+        cursor.execute("SELECT registration_number FROM Students WHERE email = %s", (email,))
+        registration_number = cursor.fetchone()[0]
+
+        for course_name in selected_course_names:
+            # Check if this course is already registered
+            cursor.execute(
+                "SELECT COUNT(*) FROM registrations WHERE registration_number = %s AND course_name = %s",
+                (registration_number, course_name)
+            )
+            exists = cursor.fetchone()[0]
+
+            if exists == 0:
+                # Insert the course only if it's not already registered
+                cursor.execute(
+                    "INSERT INTO registrations (registration_number, course_name, teacher_name) "
+                    "VALUES (%s, %s, (SELECT teacher_name FROM Course WHERE course_name = %s))",
+                    (registration_number, course_name, course_name)
+                )
+            else:
+                print(f"Course '{course_name}' is already registered by this student.")
+
+        db_connection.commit()
+        return redirect(url_for('student'))
+    
+@app.route('/unregister-course', methods=['POST'])
+def unregister_course():
+    email = session.get('email')
+    
+    if not email:
+        return "Email not found in session"
+
+    # Get the course name from the form data
+    course_name = request.form['course_name']
+    
+    # Fetch the student's registration number
+    cursor = db_connection.cursor()
+    cursor.execute("SELECT registration_number FROM Students WHERE email = %s", (email,))
+    registration_number = cursor.fetchone()[0]
+
+    # Delete the specified course from the registrations table
+    cursor.execute(
+        "DELETE FROM registrations WHERE registration_number = %s AND course_name = %s",
+        (registration_number, course_name)
+    )
+    db_connection.commit()
+
+    # Redirect back to the student page to view the updated list of courses
+    return redirect(url_for('student'))
+
 
 def get_registered_courses(email):
     try:
         cursor = db_connection.cursor()
 
-        # Query to fetch the registered courses for the student
-        cursor.execute("SELECT course_name, teacher_name FROM registrations WHERE registration_number = (SELECT registration_number FROM Students WHERE email = %s)", (email,))
-        registered_courses = cursor.fetchall()
+        # Query to fetch the registration number of the student based on email
+        cursor.execute("SELECT registration_number FROM Students WHERE email = %s", (email,))
+        result = cursor.fetchone()
+
+        if not result:
+            return []  # No registration number found for this email
+        
+        registration_number = result[0]
+
+        # Query to fetch courses based on the student's registration number
+        cursor.execute("SELECT course_name, teacher_name FROM registrations WHERE registration_number = %s", (registration_number,))
+        courses = cursor.fetchall()
+
+        # Convert the fetched data into a list of dictionaries
+        registered_courses = [{'course_name': row[0], 'teacher_name': row[1]} for row in courses]
 
         return registered_courses
 
@@ -261,15 +314,34 @@ def get_registered_courses(email):
 
 @app.route('/view-courses')
 def view_courses():
-    # Retrieve the email from the session
     email = session.get('email')
+    
     if email:
-        # Fetch student's registered courses
-        registered_courses = get_registered_courses(email)
-        # Render the student.html template with the registered courses data
+        cursor = db_connection.cursor()
+        
+        # Fetch the student's registration number
+        cursor.execute("SELECT registration_number FROM Students WHERE email = %s", (email,))
+        registration_number = cursor.fetchone()
+        
+        if not registration_number:
+            return "Student registration number not found"
+        
+        registration_number = registration_number[0]
+
+        # Fetch courses from the registrations table
+        cursor.execute(
+            "SELECT course_name, teacher_name FROM registrations WHERE registration_number = %s",
+            (registration_number,)
+        )
+        courses = cursor.fetchall()
+
+        # Convert to a list of dictionaries
+        registered_courses = [{'course_name': row[0], 'teacher_name': row[1]} for row in courses]
+
         return render_template('student.html', registered_courses=registered_courses)
     else:
         return "Email not found in session"
+
 
 @app.route('/student')
 def student():
