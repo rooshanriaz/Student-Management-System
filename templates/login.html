@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<img src="{{ url_for('static', filename='logo.png') }}">
 <title>Login Page</title>
 <style>
     body {
@@ -89,9 +91,10 @@
 </head>
 <body>
     <div class="header">
-        <img src="logo.png" alt="GIKI Logo">
+        <img src="{{ url_for('static', filename='logo.jpg') }}" class="logo">
         <button class="contact-us-button">Contact Us</button>
     </div>
+    
 
     <div class="login-container">
         <h2>Login</h2>
