@@ -556,71 +556,74 @@ def insert_student():
 # Update student
 @app.route('/update-student', methods=['POST'])
 def update_student():
-    data = {
-        'email': request.form['email'],  # Use email as the identifier
-        'name': request.form['name'],
-        'dob': request.form['dob'],
-        'cgpa': request.form['cgpa'],
-        'enrollment_year': request.form['enrollment_year'],
-        'father_name': request.form['father_name'],
-        'cnic': request.form['cnic'],
-        'address': request.form['address'],
-        'program': request.form['program'],
-        'scholarship': request.form['scholarship'],
-        'status': request.form['status']
+    email = request.form['email']  # Using email to identify the student
+    # Define the updated_data dictionary using form data
+    updated_data = {
+        'name': request.form.get('name'),  # Using .get to avoid KeyError if key doesn't exist
+        'dob': request.form.get('dob'),
+        'cgpa': request.form.get('cgpa'),
+        'enrollment_year': request.form.get('enrollment_year'),
+        'father_name': request.form.get('father_name'),
+        'cnic': request.form.get('cnic'),
+        'address': request.form.get('address'),
+        'program': request.form.get('program'),
+        'scholarship': request.form.get('scholarship'),
+        'status': request.form.get('status')
     }
+
     try:
-        cursor = db_connection.cursor()
-        cursor.execute(
-            """UPDATE Students SET student_name=%s, student_date_of_birth=%s, student_cgpa=%s,
-            student_enrollment_year=%s, Father_name=%s, student_cnic=%s, student_address=%s,
-            student_program_name=%s, student_scholarship=%s, student_status=%s
-            WHERE email=%s""",
-            (data['name'], data['dob'], data['cgpa'], data['enrollment_year'], data['father_name'],
-             data['cnic'], data['address'], data['program'], data['scholarship'], data['status'], data['email'])
-        )
-        db_connection.commit()
-    except psycopg2.Error as e:
+        # Assuming 'db' is your Firestore client instance
+        db.collection('students').document(email).update(updated_data)
+        return redirect(url_for('admin'))  # Redirect to the 'admin' page or appropriate endpoint
+    except Exception as e:
         print(f"Error updating student: {e}")
-        db_connection.rollback()
-        return "Error updating student"
-    return redirect(url_for('admin'))
+        return f"Error updating student: {e}", 500
 
 @app.route('/delete-student', methods=['POST'])
 def delete_student():
     email = request.form['email']
+    cursor = None
     try:
+        # Open a cursor to perform database operations
         cursor = db_connection.cursor()
 
-        # Start transaction
-        cursor.execute("BEGIN")
-
-        # Check if the student exists
+        # Check if the student exists before attempting deletion
         cursor.execute("SELECT registration_number FROM Students WHERE email=%s", (email,))
         student = cursor.fetchone()
         if not student:
-            db_connection.rollback()
             return "Student record not found", 404
 
         registration_number = student[0]
 
-        # Delete from Registrations table first
+        # Delete from Registrations table first to comply with foreign key constraints
         cursor.execute("DELETE FROM Registrations WHERE registration_number=%s", (registration_number,))
-
+        
         # Delete from Students table
         cursor.execute("DELETE FROM Students WHERE email=%s", (email,))
-
+        
         # Delete from Credentials table
         cursor.execute("DELETE FROM Credentials WHERE email=%s AND role='student'", (email,))
 
-        # Commit transaction
+        # Commit all changes
         db_connection.commit()
-        return redirect(url_for('admin'))
+
+        # After successfully deleting from the database, delete from Firestore
+        db.collection('students').document(email).delete()
+
+        # Redirect to admin page or wherever appropriate after successful deletion
+        return redirect(url_for('admin'))  # Assuming 'admin' is the correct redirection target
+
     except psycopg2.Error as e:
-        db_connection.rollback()  # Rollback in case of error
-        return f"Error deleting student: {str(e)}", 500
+        db_connection.rollback()  # Ensure database integrity by rolling back on error
+        return f"Error deleting student in database: {str(e)}", 500
+    except Exception as e:
+        db_connection.rollback()
+        return f"Error deleting student in Firestore: {str(e)}", 500
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
+
+
 
 
 @app.route('/allocate-course', methods=['POST'])
