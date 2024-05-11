@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, m
 import psycopg2
 from psycopg2 import sql
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 import firebase_admin
 from firebase_admin import credentials
@@ -708,13 +708,13 @@ def setup_delete_student_trigger():
     """)
 
     conn.commit()
-    cursor.close()
+    cursor.close()s
     conn.close()
     print("DeleteStudentRegistrations trigger has been set up successfully.")
 
 
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     setup_enrollment_trigger()  # Set up the enrollment increment trigger
     setup_delete_student_trigger()  # Set up the delete student registrations trigger
     app.run(debug=True)
