@@ -4,6 +4,13 @@ from psycopg2 import sql
 
 app = Flask(__name__)
 
+import firebase_admin
+from firebase_admin import credentials
+
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
+
+
 app.secret_key = '1PoepThNcgk6MiS1EM3wygyokLzjTNkY'
 
 # Database setup
