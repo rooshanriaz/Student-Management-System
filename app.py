@@ -446,28 +446,35 @@ def insert_teacher():
         'email': request.form['email'],
         'position': request.form['position'],
         'program_name': request.form['program_name'],
-        'password': request.form['password']
+        'password': request.form['password']  # Consider using secure password handling
     }
-
-    cursor = db_connection.cursor()
     try:
-        # First, insert into Credentials
+        # Insert into PostgreSQL Credentials and Teachers table
+        cursor = db_connection.cursor()
         cursor.execute(
-            """INSERT INTO Credentials (email, password, role) VALUES (%s, %s, 'teacher')""",
+            "INSERT INTO Credentials (email, password, role) VALUES (%s, %s, 'teacher')",
             (data['email'], data['password'])
         )
-        # Then, insert into Teachers
         cursor.execute(
-            """INSERT INTO Teachers (teacher_name, email, teacher_position, teacher_program_name) 
-            VALUES (%s, %s, %s, %s)""",
+            "INSERT INTO Teachers (teacher_name, email, teacher_position, teacher_program_name) VALUES (%s, %s, %s, %s)",
             (data['name'], data['email'], data['position'], data['program_name'])
         )
         db_connection.commit()
+
+        # Insert into Firestore
+        db.collection('teachers').document(data['email']).set(data)
+
         return redirect(url_for('admin'))
     except psycopg2.Error as e:
         db_connection.rollback()
-        print(f"Error inserting teacher: {e}")
-        return "Error inserting teacher", 500
+        return f"Error inserting teacher in database: {str(e)}", 500
+    except Exception as e:
+        db_connection.rollback()
+        return f"Error inserting teacher in Firestore: {str(e)}", 500
+    finally:
+        if cursor:
+            cursor.close()
+
 
 # Update teacher with program name
 @app.route('/update-teacher', methods=['POST'])
@@ -492,22 +499,34 @@ def update_teacher():
         return "Error updating teacher"
     return redirect(url_for('admin'))
 
-# Delete teacher
 @app.route('/delete-teacher', methods=['POST'])
 def delete_teacher():
     email = request.form['email']
+    cursor = None
     try:
         cursor = db_connection.cursor()
-        # First, remove from Credentials
-        cursor.execute("DELETE FROM Credentials WHERE email=%s AND role='teacher'", (email,))
-        # Then, remove from Teachers
+        # Start by deleting from the Teachers table to respect foreign key constraints
         cursor.execute("DELETE FROM Teachers WHERE email=%s", (email,))
+        
+        # Then delete from Credentials
+        cursor.execute("DELETE FROM Credentials WHERE email=%s AND role='teacher'", (email,))
         db_connection.commit()
+
+        # After ensuring the database entries are deleted, delete from Firestore
+        db.collection('teachers').document(email).delete()
+
+        return redirect(url_for('admin'))
     except psycopg2.Error as e:
-        print(f"Error deleting teacher: {e}")
-        db_connection.rollback()
-        return "Error deleting teacher"
-    return redirect(url_for('admin'))
+        db_connection.rollback()  # Rollback in case of error
+        return f"Error deleting teacher in database: {str(e)}", 500
+    except Exception as e:
+        db_connection.rollback()  # Ensure DB integrity if Firestore fails
+        return f"Error deleting teacher in Firestore: {str(e)}", 500
+    finally:
+        if cursor:
+            cursor.close()
+
+
 
 # Insert student
 @app.route('/insert-student', methods=['POST'])
