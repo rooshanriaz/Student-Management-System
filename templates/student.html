@@ -3,113 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Page</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Student Details</title>
     <style>
-        /* Additional CSS styles for student page */
-        .section {
-            margin-bottom: 30px;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
         }
-        .banner {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
+
+        h1 {
             text-align: center;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            color: #333;
         }
-        .grades {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            background-color: #f9f9f9;
-        }
-        .grades ul {
+
+        ul {
             list-style-type: none;
             padding: 0;
+            text-align: center;
+            margin-top: 20px;
         }
-        .grades li {
-            margin-bottom: 10px;
+
+        ul li {
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        ul li a {
+            text-decoration: none;
+            color: #333;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        ul li a:hover {
+            background-color: #ddd;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+        }
+
+        .logout-button {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #d9534f;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logout-button:hover {
+            background-color: #c9302c;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="banner">
-            <h1>Welcome, <span id="studentName"></span>!</h1>
-        </div>
-        <div class="section">
-            <h2>My Courses</h2>
-            <ul id="courseList">
-                <!-- Courses will be dynamically added here -->
-            </ul>
-        </div>
-        <div class="section">
-            <h2>Register for Courses</h2>
-            <form id="registerForm">
-                <label for="course">Course:</label>
-                <select id="course" name="course">
-                    <option value="Math">Math</option>
-                    <option value="Science">Science</option>
-                    <option value="History">History</option>
-                </select><br><br>
-                <input type="submit" value="Register">
-            </form>
-        </div>
-        <div class="section">
-            <h2>My Grades</h2>
-            <div class="grades" id="gradesList">
-                <!-- Grades will be dynamically added here -->
-            </div>
-        </div>
-        <div class="section">
-            <h2>Give Feedback</h2>
-            <form id="feedbackForm">
-                <label for="courseFeedback">Course:</label>
-                <select id="courseFeedback" name="courseFeedback">
-                    <option value="Math">Math</option>
-                    <option value="Science">Science</option>
-                    <option value="History">History</option>
-                </select><br><br>
-                <label for="feedback">Feedback:</label>
-                <textarea id="feedback" name="feedback" rows="4" cols="50"></textarea><br><br>
-                <input type="submit" value="Submit Feedback">
-            </form>
-        </div>
-        <div class="section">
-            <h2>My Attendance</h2>
-            <ul id="attendanceList">
-                <!-- Attendance records will be dynamically added here -->
-            </ul>
-        </div>
+    <h1>Student Details</h1>
+    <ul>
+        <li><a href="#" onclick="toggleDetails()">View My Details</a></li>
+        <li><a href="/view-courses">View My Courses</a></li>
+        <li><a href="/register-courses">Register for Courses</a></li>
+        <li><a href="/logout" class="logout-button">Logout</a></li>
+    </ul>
+
+    <!-- Table to display student details -->
+    {% if students %}
+    <table border="1" id="detailsTable">
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <th>Name:</th>
+                <td>{{ student.student_name }}</td>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <td>{{ student.email }}</td>
+            </tr>
+            <tr>
+                <th>Date of Birth:</th>
+                <td>{{ student.student_date_of_birth }}</td>
+            </tr>
+            <tr>
+                <th>CGPA:</th>
+                <td>{{ student.student_cgpa }}</td>
+            </tr>
+            <tr>
+                <th>Enrollment Year:</th>
+                <td>{{ student.student_enrollment_year }}</td>
+            </tr>
+            <tr>
+                <th>Father Name:</th>
+                <td>{{ student.student_father_name }}</td>
+            </tr>
+            <tr>
+                <th>CNIC:</th>
+                <td>{{ student.student_cnic }}</td>
+            </tr>
+            <tr>
+                <th>Address:</th>
+                <td>{{ student.student_address }}</td>
+            </tr>
+            <tr>
+                <th>Scholarship:</th>
+                <td>{{ student.student_scholarship }}</td>
+            </tr>
+            <tr>
+                <th>Status:</th>
+                <td>{{ student.student_status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- Section for registering courses -->
+    {% if courses %}
+    <div id="registerCourses">
+        <h2>Register for Courses</h2>
+        <form action="/register-courses" method="POST">
+            <label for="course">Select Course:</label>
+            <select name="course" id="course">
+                {% for course in courses %}
+                <option value="{{ course.course_name }}">{{ course.course_name }} ({{ course.teacher_name }})</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Register</button>
+        </form>
     </div>
-    <script src="script.js"></script>
+    {% endif %}
+
+    <!-- Single Section for Registered Courses with Unregister Option -->
+    {% if registered_courses %}
+    <div id="registeredCourses">
+        <h2>Registered Courses</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Teacher Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in registered_courses %}
+                <tr>
+                    <td>{{ course.course_name }}</td>
+                    <td>{{ course.teacher_name }}</td>
+                    <td>
+                        <!-- Form for unregistering a course -->
+                        <form action="/unregister-course" method="POST">
+                            <input type="hidden" name="course_name" value="{{ course.course_name }}">
+                            <button type="submit">Unregister</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No registered courses found for this student.</p>
+    {% endif %}
+
     <script>
-        // Sample data for grades
-        var gradeData = [
-            { course: 'Math', grade: 'A' },
-            { course: 'Science', grade: 'B' },
-            { course: 'History', grade: 'A-' }
-        ];
-
-        // Function to populate grades list
-        function populateGradesList() {
-            var gradesList = document.getElementById('gradesList');
-            gradesList.innerHTML = ''; // Clear existing list items
-            gradeData.forEach(function(grade) {
-                var listItem = document.createElement('div');
-                listItem.innerHTML = '<p>Course: ' + grade.course + ', Grade: ' + grade.grade + '</p>';
-                gradesList.appendChild(listItem);
-            });
+        function toggleDetails() {
+            var table = document.getElementById("detailsTable");
+            if (table.style.display === "none") {
+                table.style.display = "table";
+            } else {
+                table.style.display = "none";
+            }
         }
-
-        // Call the function to populate grades list
-        populateGradesList();
-
-        // Update student name in the banner
-        var studentNameElement = document.getElementById('studentName');
-        // Replace 'John Doe' with actual student name retrieved from backend
-        studentNameElement.textContent = 'John Doe'; 
     </script>
 </body>
 </html>
