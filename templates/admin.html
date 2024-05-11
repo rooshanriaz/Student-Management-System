@@ -122,7 +122,28 @@
             <button class="tablinks" onclick="openTab(event, 'allocate_courses')">Allocate Courses</button>
         </div>
 
-       
+        <!-- Allocation Courses -->
+        <div id="allocate_courses" class="tabcontent">
+            <h2>Allocate Courses to Teachers</h2>
+            <form action="/allocate-course" method="POST">
+                <label for="course_name">Select Course:</label>
+                <select name="course_name" id="course_name">
+                    {% for course in courses %}
+                    <option value="{{ course[0] }}">{{ course[0] }}</option>
+                    {% endfor %}
+                </select><br><br>
+        
+                <label for="teacher_email">Select Teacher:</label>
+                <select name="teacher_email" id="teacher_email">
+                    {% for teacher in teachers %}
+                    <option value="{{ teacher[0] }}">{{ teacher[1] }}</option>
+                    {% endfor %}
+                </select><br><br>
+        
+                <input type="submit" value="Allocate Course">
+            </form>
+        </div>
+
 
         <!-- Insert Student -->
         <div id="insert_student" class="tabcontent">

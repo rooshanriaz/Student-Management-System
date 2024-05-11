@@ -338,29 +338,23 @@ def view_students():
 
 @app.route('/remove-student', methods=['POST'])
 def remove_student():
-    email = session.get('email')
-
-    if not email:
-        return "Email not found in session"
-
     course_name = request.form['course_name']
     student_name = request.form['student_name']
 
-    cursor = db_connection.cursor()
-    cursor.execute("SELECT registration_number FROM Students WHERE student_name = %s", (student_name,))
-    registration_number = cursor.fetchone()
+    try:
+        cursor = db_connection.cursor()
+        # Retrieve the registration number based on student name
+        cursor.execute("SELECT registration_number FROM Students WHERE student_name = %s", (student_name,))
+        registration_number = cursor.fetchone()[0]
 
-    if registration_number:
-        registration_number = registration_number[0]
-        cursor.execute(
-            "DELETE FROM registrations WHERE registration_number = %s AND course_name = %s",
-            (registration_number, course_name)
-        )
+        # Delete the registration entry
+        cursor.execute("DELETE FROM Registrations WHERE registration_number = %s AND course_name = %s", (registration_number, course_name))
         db_connection.commit()
-    else:
-        return f"Student '{student_name}' not found."
+    except psycopg2.Error as e:
+        db_connection.rollback()
+        return f"Failed to remove student due to: {e}", 500
 
-    return redirect(url_for('view_students'))
+    return redirect(url_for('teacher'))  # Redirect back to the teacher view
 
 @app.route('/student')
 def student():
@@ -376,33 +370,40 @@ def student():
 @app.route('/teacher')
 def teacher():
     email = session.get('email')
-
-    if email:
-        cursor = db_connection.cursor()
+    if not email:
+        return "Email not found in session", 404
+    
+    cursor = db_connection.cursor()
+    try:
+        # Fetch teacher details
         cursor.execute("SELECT teacher_name, email, teacher_position FROM Teachers WHERE email = %s", (email,))
-        teacher_data = cursor.fetchone()
-
-        if teacher_data:
-            teacher_details = {
-                'teacher_name': teacher_data[0],
-                'email': teacher_data[1],
-                'teacher_position': teacher_data[2]
-            }
-
-            cursor.execute(
-                "SELECT s.student_name, r.course_name FROM registrations r "
-                "JOIN Students s ON r.registration_number = s.registration_number "
-                "WHERE r.teacher_name = %s",
-                (teacher_data[0],)
-            )
-            enrolled_students = [{'student_name': row[0], 'course_name': row[1]} for row in cursor.fetchall()]
-
-            response = make_response(render_template('teacher.html', teacher_details=teacher_details, enrolled_students=enrolled_students))
-            return no_cache(response)
-        else:
-            return "Teacher details not found."
-    else:
-        return "Email not found in session."
+        teacher_details = cursor.fetchone()
+        if not teacher_details:
+            return "Teacher details not found.", 404
+        
+        # Fetch courses taught by this teacher along with enrolled students
+        cursor.execute("""
+            SELECT c.course_name, s.student_name, s.email
+            FROM Course c
+            LEFT JOIN Registrations r ON c.course_name = r.course_name
+            LEFT JOIN Students s ON r.registration_number = s.registration_number
+            WHERE c.teacher_email = %s
+        """, (email,))
+        course_details = cursor.fetchall()
+        
+        # Organize courses and enrolled students
+        courses = {}
+        for course_name, student_name, student_email in course_details:
+            if course_name not in courses:
+                courses[course_name] = []
+            if student_name and student_email:  # Ensure that only valid student entries are added
+                courses[course_name].append((student_name, student_email))
+    except psycopg2.Error as e:
+        print(f"Database error: {e}")
+        return "Database error", 500
+    
+    # Render the teacher template with course and student details
+    return render_template('teacher.html', teacher_details=teacher_details, courses=courses)
 
 @app.route('/admin')
 def admin():
@@ -424,6 +425,36 @@ def admin():
     # Pass the data to the template
     response = make_response(render_template('admin.html', teachers=teachers, courses=courses))
     return no_cache(response)
+
+@app.route('/insert-teacher', methods=['POST'])
+def insert_teacher():
+    data = {
+        'name': request.form['name'],
+        'email': request.form['email'],
+        'position': request.form['position'],
+        'program_name': request.form['program_name'],
+        'password': request.form['password']
+    }
+
+    cursor = db_connection.cursor()
+    try:
+        # First, insert into Credentials
+        cursor.execute(
+            """INSERT INTO Credentials (email, password, role) VALUES (%s, %s, 'teacher')""",
+            (data['email'], data['password'])
+        )
+        # Then, insert into Teachers
+        cursor.execute(
+            """INSERT INTO Teachers (teacher_name, email, teacher_position, teacher_program_name) 
+            VALUES (%s, %s, %s, %s)""",
+            (data['name'], data['email'], data['position'], data['program_name'])
+        )
+        db_connection.commit()
+        return redirect(url_for('admin'))
+    except psycopg2.Error as e:
+        db_connection.rollback()
+        print(f"Error inserting teacher: {e}")
+        return "Error inserting teacher", 500
 
 # Update teacher with program name
 @app.route('/update-teacher', methods=['POST'])
@@ -576,10 +607,28 @@ def update_password():
         return f"Error updating password for {role}"
     return redirect(url_for('admin'))
 
+@app.route('/allocate-course', methods=['POST'])
+def allocate_course():
+    course_name = request.form['course_name']
+    teacher_email = request.form['teacher_email']
+    cursor = db_connection.cursor()
+    try:
+        # Update the course to allocate it to the selected teacher
+        cursor.execute("UPDATE Course SET teacher_email = %s WHERE course_name = %s", (teacher_email, course_name))
+        db_connection.commit()
+        return redirect(url_for('admin'))
+    except psycopg2.Error as e:
+        db_connection.rollback()
+        print(f"Error allocating course: {e}")
+        return "Error allocating course"
+
+    return redirect(url_for('admin'))
+
 @app.route('/logout')
 def logout():
-    session.clear()
+    session.clear()  # Clear all session data
     return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)

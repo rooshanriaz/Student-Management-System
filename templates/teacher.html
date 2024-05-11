@@ -90,8 +90,6 @@
     <ul>
         <li><a href="#" onclick="toggleDetails()">View My Details</a></li>
         <li><a href="/view-students">View Students</a></li>
-        <li><a href="/mark-attendance">Mark Attendance</a></li>
-        <li><a href="/give-grades">Give Grades</a></li>
         <li><a href="/logout" class="logout-button">Logout</a></li>
     </ul>
 
@@ -115,7 +113,6 @@
 
     <p id="noDetailsMsg" style="text-align: center; display: none;">No teacher found.</p>
 
-    <!-- Enrolled Students by Course -->
     {% if enrolled_students %}
     <h2>Enrolled Students by Course</h2>
     {% for course_name, students in enrolled_students.items() %}
@@ -144,9 +141,9 @@
         </tbody>
     </table>
     {% endfor %}
-    {% else %}
+{% else %}
     <p>No students are currently enrolled in your courses.</p>
-    {% endif %}
+{% endif %}
 
     <script>
         function toggleDetails() {
