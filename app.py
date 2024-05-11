@@ -1,3 +1,4 @@
+import dbm
 from flask import Flask, render_template, request, redirect, url_for, session, make_response
 import psycopg2
 from psycopg2 import sql
@@ -7,8 +8,13 @@ app = Flask(__name__)
 import firebase_admin
 from firebase_admin import credentials
 
+from firebase_admin import firestore
+
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
+
+# Initialize Firestore DB
+db = firestore.client()
 
 
 app.secret_key = '1PoepThNcgk6MiS1EM3wygyokLzjTNkY'
@@ -539,10 +545,12 @@ def insert_student():
              data['scholarship'], data['status'])
         )
         db_connection.commit()
+        db.collection('students').document(data['email']).set(data)
+        return redirect(url_for('admin'))
     except psycopg2.Error as e:
         print(f"Error inserting student: {e}")
         db_connection.rollback()
-        return "Error inserting student"
+        #return "Error inserting student"
     return redirect(url_for('admin'))
 
 # Update student
@@ -711,8 +719,6 @@ def setup_delete_student_trigger():
     cursor.close()
     conn.close()
     print("DeleteStudentRegistrations trigger has been set up successfully.")
-
-
 
 if __name__ == '__main__':
     setup_enrollment_trigger()  # Set up the enrollment increment trigger
