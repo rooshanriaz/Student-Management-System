@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Admin Page</title>
     <style>
         body {
@@ -82,8 +79,8 @@
             border-top: none;
         }
 
-        /* Style the input fields */
         input[type="text"],
+        input[type="email"],
         input[type="password"],
         input[type="submit"],
         select {
@@ -111,65 +108,194 @@
     <div class="container">
         <div class="header">
             <h1>Welcome, Admin!</h1>
-            <a href="/logout">
-                <button class="logout-button">Logout</button>
-            </a>
+            <a href="/logout"><button class="logout-button">Logout</button></a>
         </div>
 
         <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'insert')">Insert</button>
-            <button class="tablinks" onclick="openTab(event, 'delete')">Delete</button>
-            <button class="tablinks" onclick="openTab(event, 'update')">Update</button>
+            <button class="tablinks" onclick="openTab(event, 'insert_student')">Insert Student</button>
+            <button class="tablinks" onclick="openTab(event, 'update_student')">Update Student</button>
+            <button class="tablinks" onclick="openTab(event, 'delete_student')">Delete Student</button>
+            <button class="tablinks" onclick="openTab(event, 'insert_teacher')">Insert Teacher</button>
+            <button class="tablinks" onclick="openTab(event, 'update_teacher')">Update Teacher</button>
+            <button class="tablinks" onclick="openTab(event, 'delete_teacher')">Delete Teacher</button>
+            <button class="tablinks" onclick="openTab(event, 'update_password')">Update Password</button>
+            <button class="tablinks" onclick="openTab(event, 'allocate_courses')">Allocate Courses</button>
         </div>
 
-        <!-- Insert tab content -->
-        <div id="insert" class="tabcontent">
-            <div class="section">
-                <h2>Insert Student</h2>
-                <form id="insertStudentForm">
-                    <!-- Student insertion form fields -->
-                </form>
-            </div>
-            <div class="section">
-                <h2>Insert Teacher</h2>
-                <form id="insertTeacherForm">
-                    <!-- Teacher insertion form fields -->
-                </form>
-            </div>
+       
+
+        <!-- Insert Student -->
+        <div id="insert_student" class="tabcontent">
+            <h2>Insert Student</h2>
+            <form action="/insert-student" method="POST">
+                <label for="registration_number">Registration Number:</label>
+                <input type="text" id="registration_number" name="registration_number" required>
+
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="dob">Date of Birth:</label>
+                <input type="text" id="dob" name="dob" placeholder="YYYY-MM-DD" required>
+
+                <label for="cgpa">CGPA:</label>
+                <input type="text" id="cgpa" name="cgpa" required>
+
+                <label for="enrollment_year">Enrollment Year:</label>
+                <input type="text" id="enrollment_year" name="enrollment_year" required>
+
+                <label for="father_name">Father Name:</label>
+                <input type="text" id="father_name" name="father_name" required>
+
+                <label for="cnic">CNIC:</label>
+                <input type="text" id="cnic" name="cnic" required>
+
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" required>
+
+                <label for="program">Program:</label>
+                <input type="text" id="program" name="program" required>
+
+                <label for="scholarship">Scholarship:</label>
+                <input type="text" id="scholarship" name="scholarship">
+
+                <label for="status">Status:</label>
+                <input type="text" id="status" name="status" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <input type="submit" value="Insert">
+            </form>
         </div>
 
-        <!-- Delete tab content -->
-        <div id="delete" class="tabcontent">
-            <div class="section">
-                <h2>Delete Student</h2>
-                <form id="deleteStudentForm">
-                    <!-- Student deletion form fields -->
-                </form>
-            </div>
-            <div class="section">
-                <h2>Delete Teacher</h2>
-                <form id="deleteTeacherForm">
-                    <!-- Teacher deletion form fields -->
-                </form>
-            </div>
+        <!-- Update Student -->
+        <div id="update_student" class="tabcontent">
+            <h2>Update Student</h2>
+            <form action="/update-student" method="POST">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="dob">Date of Birth:</label>
+                <input type="text" id="dob" name="dob" placeholder="YYYY-MM-DD" required>
+
+                <label for="cgpa">CGPA:</label>
+                <input type="text" id="cgpa" name="cgpa" required>
+
+                <label for="enrollment_year">Enrollment Year:</label>
+                <input type="text" id="enrollment_year" name="enrollment_year" required>
+
+                <label for="father_name">Father Name:</label>
+                <input type="text" id="father_name" name="father_name" required>
+
+                <label for="cnic">CNIC:</label>
+                <input type="text" id="cnic" name="cnic" required>
+
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" required>
+
+                <label for="program">Program:</label>
+                <input type="text" id="program" name="program" required>
+
+                <label for="scholarship">Scholarship:</label>
+                <input type="text" id="scholarship" name="scholarship">
+
+                <label for="status">Status:</label>
+                <input type="text" id="status" name="status" required>
+
+                <input type="submit" value="Update">
+            </form>
         </div>
 
-        <!-- Update tab content -->
-        <div id="update" class="tabcontent">
-            <div class="section">
-                <h2>Update Student Data</h2>
-                <form id="updateStudentForm">
-                    <!-- Student update form fields -->
-                </form>
-            </div>
-            <div class="section">
-                <h2>Update Teacher Data</h2>
-                <form id="updateTeacherForm">
-                    <!-- Teacher update form fields -->
-                </form>
-            </div>
+        <!-- Delete Student -->
+        <div id="delete_student" class="tabcontent">
+            <h2>Delete Student</h2>
+            <form action="/delete-student" method="POST">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <input type="submit" value="Delete">
+            </form>
+        </div>
+
+        <!-- Insert Teacher -->
+<div id="insert_teacher" class="tabcontent">
+    <h2>Insert Teacher</h2>
+    <form action="/insert-teacher" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="position">Position:</label>
+        <input type="text" id="position" name="position" required>
+
+        <label for="program_name">Program Name:</label>
+        <input type="text" id="program_name" name="program_name" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <input type="submit" value="Insert">
+    </form>
+</div>
+
+<!-- Update Teacher -->
+<div id="update_teacher" class="tabcontent">
+    <h2>Update Teacher</h2>
+    <form action="/update-teacher" method="POST">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="position">Position:</label>
+        <input type="text" id="position" name="position" required>
+
+        <label for="program_name">Program Name:</label>
+        <input type="text" id="program_name" name="program_name" required>
+
+        <input type="submit" value="Update">
+    </form>
+</div>
+
+        <!-- Delete Teacher -->
+        <div id="delete_teacher" class="tabcontent">
+            <h2>Delete Teacher</h2>
+            <form action="/delete-teacher" method="POST">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <input type="submit" value="Delete">
+            </form>
+        </div>
+
+        <!-- Update Password -->
+        <div id="update_password" class="tabcontent">
+            <h2>Update Password</h2>
+            <form action="/update-password" method="POST">
+                <label for="role">Role (student or teacher):</label>
+                <input type="text" id="role" name="role" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="password">New Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <input type="submit" value="Update Password">
+            </form>
         </div>
     </div>
+    
+
 
     <script>
         function openTab(evt, tabName) {

@@ -406,8 +406,175 @@ def teacher():
 
 @app.route('/admin')
 def admin():
-    response = make_response(render_template('admin.html'))
+    cursor = db_connection.cursor()
+    try:
+        # Fetch teachers
+        cursor.execute("SELECT email, teacher_name FROM Teachers")
+        teachers = cursor.fetchall()
+
+        # Fetch courses
+        cursor.execute("SELECT course_name FROM Course")
+        courses = cursor.fetchall()
+
+    except psycopg2.Error as e:
+        print("Database error:", e)
+        teachers = []
+        courses = []
+
+    # Pass the data to the template
+    response = make_response(render_template('admin.html', teachers=teachers, courses=courses))
     return no_cache(response)
+
+# Update teacher with program name
+@app.route('/update-teacher', methods=['POST'])
+def update_teacher():
+    data = {
+        'email': request.form['email'],
+        'name': request.form['name'],
+        'position': request.form['position'],
+        'program_name': request.form['program_name']
+    }
+    try:
+        cursor = db_connection.cursor()
+        cursor.execute(
+            """UPDATE Teachers SET teacher_name=%s, teacher_position=%s, teacher_program_name=%s 
+            WHERE email=%s""",
+            (data['name'], data['position'], data['program_name'], data['email'])
+        )
+        db_connection.commit()
+    except psycopg2.Error as e:
+        print(f"Error updating teacher: {e}")
+        db_connection.rollback()
+        return "Error updating teacher"
+    return redirect(url_for('admin'))
+
+# Delete teacher
+@app.route('/delete-teacher', methods=['POST'])
+def delete_teacher():
+    email = request.form['email']
+    try:
+        cursor = db_connection.cursor()
+        # First, remove from Credentials
+        cursor.execute("DELETE FROM Credentials WHERE email=%s AND role='teacher'", (email,))
+        # Then, remove from Teachers
+        cursor.execute("DELETE FROM Teachers WHERE email=%s", (email,))
+        db_connection.commit()
+    except psycopg2.Error as e:
+        print(f"Error deleting teacher: {e}")
+        db_connection.rollback()
+        return "Error deleting teacher"
+    return redirect(url_for('admin'))
+
+# Insert student
+@app.route('/insert-student', methods=['POST'])
+def insert_student():
+    data = {
+        'registration_number': request.form['registration_number'],
+        'name': request.form['name'],
+        'email': request.form['email'],
+        'dob': request.form['dob'],
+        'cgpa': request.form['cgpa'],
+        'enrollment_year': request.form['enrollment_year'],
+        'father_name': request.form['father_name'],
+        'cnic': request.form['cnic'],
+        'address': request.form['address'],
+        'program': request.form['program'],
+        'scholarship': request.form['scholarship'],
+        'status': request.form['status'],
+        'password': request.form['password']
+    }
+    try:
+        cursor = db_connection.cursor()
+        # First, insert into Credentials
+        cursor.execute(
+            """INSERT INTO Credentials (email, password, role) VALUES (%s, %s, 'student')""",
+            (data['email'], data['password'])
+        )
+        # Then, insert into Students
+        cursor.execute(
+            """INSERT INTO Students (registration_number, student_name, email, student_date_of_birth,
+            student_cgpa, student_enrollment_year, Father_name, student_cnic, student_address,
+            student_program_name, student_scholarship, student_status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+            (data['registration_number'], data['name'], data['email'], data['dob'], data['cgpa'],
+             data['enrollment_year'], data['father_name'], data['cnic'], data['address'], data['program'],
+             data['scholarship'], data['status'])
+        )
+        db_connection.commit()
+    except psycopg2.Error as e:
+        print(f"Error inserting student: {e}")
+        db_connection.rollback()
+        return "Error inserting student"
+    return redirect(url_for('admin'))
+
+# Update student
+@app.route('/update-student', methods=['POST'])
+def update_student():
+    data = {
+        'email': request.form['email'],  # Use email as the identifier
+        'name': request.form['name'],
+        'dob': request.form['dob'],
+        'cgpa': request.form['cgpa'],
+        'enrollment_year': request.form['enrollment_year'],
+        'father_name': request.form['father_name'],
+        'cnic': request.form['cnic'],
+        'address': request.form['address'],
+        'program': request.form['program'],
+        'scholarship': request.form['scholarship'],
+        'status': request.form['status']
+    }
+    try:
+        cursor = db_connection.cursor()
+        cursor.execute(
+            """UPDATE Students SET student_name=%s, student_date_of_birth=%s, student_cgpa=%s,
+            student_enrollment_year=%s, Father_name=%s, student_cnic=%s, student_address=%s,
+            student_program_name=%s, student_scholarship=%s, student_status=%s
+            WHERE email=%s""",
+            (data['name'], data['dob'], data['cgpa'], data['enrollment_year'], data['father_name'],
+             data['cnic'], data['address'], data['program'], data['scholarship'], data['status'], data['email'])
+        )
+        db_connection.commit()
+    except psycopg2.Error as e:
+        print(f"Error updating student: {e}")
+        db_connection.rollback()
+        return "Error updating student"
+    return redirect(url_for('admin'))
+
+# Delete student
+@app.route('/delete-student', methods=['POST'])
+def delete_student():
+    email = request.form['email']
+    try:
+        cursor = db_connection.cursor()
+        # First, remove from Credentials
+        cursor.execute("DELETE FROM Credentials WHERE email=%s AND role='student'", (email,))
+        # Then, remove from Students
+        cursor.execute("DELETE FROM Students WHERE email=%s", (email,))
+        db_connection.commit()
+    except psycopg2.Error as e:
+        print(f"Error deleting student: {e}")
+        db_connection.rollback()
+        return "Error deleting student"
+    return redirect(url_for('admin'))
+
+# Update password for student or teacher
+@app.route('/update-password', methods=['POST'])
+def update_password():
+    role = request.form['role']  # 'student' or 'teacher'
+    email = request.form['email']
+    new_password = request.form['password']
+    try:
+        cursor = db_connection.cursor()
+        cursor.execute(
+            """UPDATE Credentials SET password=%s WHERE email=%s AND role=%s""",
+            (new_password, email, role)
+        )
+        db_connection.commit()
+    except psycopg2.Error as e:
+        print(f"Error updating password for {role}: {e}")
+        db_connection.rollback()
+        return f"Error updating password for {role}"
+    return redirect(url_for('admin'))
 
 @app.route('/logout')
 def logout():
