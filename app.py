@@ -9,7 +9,7 @@ app.secret_key = '1PoepThNcgk6MiS1EM3wygyokLzjTNkY'
 # Database setup
 DB_NAME = 'project'
 DB_USER = 'postgres'
-DB_PASSWORD = '0328'
+DB_PASSWORD = 'pgadmin4'
 DB_HOST = 'localhost'
 DB_PORT = '5432'
 
