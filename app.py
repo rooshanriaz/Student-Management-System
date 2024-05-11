@@ -1,7 +1,9 @@
 import dbm
-from flask import Flask, render_template, request, redirect, url_for, session, make_response
+from flask import Flask, render_template, request, redirect, url_for, session, make_response, jsonify, request, Response
 import psycopg2
 from psycopg2 import sql
+import bcrypt
+
 
 app = Flask(__name__)
 
@@ -50,6 +52,58 @@ def no_cache(response):
 @app.route('/')
 def login():
     return render_template('login.html')
+
+    try:
+        # Authenticate the user against PostgreSQL
+        cursor = db_connection.cursor()
+        cursor.execute("SELECT email, password, role FROM Credentials WHERE email = %s", (email,))
+        user_record = cursor.fetchone()
+
+        if user_record and user_record[1] == password:  # Assuming plain text comparison, ideally use hashed passwords
+            role = user_record[2]
+            # Check if the user exists in Firestore
+            user_doc_ref = db.collection(role + 's').document(email)  # 'teachers' or 'students' collection
+            user_doc = user_doc_ref.get()
+            if not user_doc.exists:
+                # If not exists in Firestore, create the Firestore document
+                user_data = {
+                    'email': email,
+                    'role': role
+                }
+                if role == 'teacher':
+                    cursor.execute("SELECT teacher_name, teacher_position, teacher_program_name FROM Teachers WHERE email = %s", (email,))
+                    additional_data = cursor.fetchone()
+                    if additional_data:
+                        user_data.update({
+                            'name': additional_data[0],
+                            'position': additional_data[1],
+                            'program_name': additional_data[2]
+                        })
+                elif role == 'student':
+                    cursor.execute("SELECT student_name, student_date_of_birth, student_program_name FROM Students WHERE email = %s", (email,))
+                    additional_data = cursor.fetchone()
+                    if additional_data:
+                        user_data.update({
+                            'name': additional_data[0],
+                            'dob': additional_data[1],
+                            'program_name': additional_data[2]
+                        })
+
+                user_doc_ref.set(user_data)  # Create the document in Firestore
+
+            # Set session and redirect to user-specific page
+            session['email'] = email
+            session['role'] = role
+            return redirect(url_for(role))  # Redirect to the role-specific page (e.g., 'teacher', 'student')
+        else:
+            return "Invalid credentials", 403
+
+    except psycopg2.Error as e:
+        return f"Database error: {str(e)}", 500
+    except Exception as e:
+        return f"Error during login: {str(e)}", 500
+    finally:
+        cursor.close()
 
 @app.route('/authenticate', methods=['POST'])
 def authenticate():
@@ -476,7 +530,6 @@ def insert_teacher():
             cursor.close()
 
 
-# Update teacher with program name
 @app.route('/update-teacher', methods=['POST'])
 def update_teacher():
     data = {
@@ -487,17 +540,33 @@ def update_teacher():
     }
     try:
         cursor = db_connection.cursor()
+        # Update the teacher in the PostgreSQL database
         cursor.execute(
-            """UPDATE Teachers SET teacher_name=%s, teacher_position=%s, teacher_program_name=%s 
-            WHERE email=%s""",
+            "UPDATE Teachers SET teacher_name=%s, teacher_position=%s, teacher_program_name=%s WHERE email=%s",
             (data['name'], data['position'], data['program_name'], data['email'])
         )
         db_connection.commit()
+
+        # Check if the document exists in Firestore, then update or create
+        teacher_ref = db.collection('teachers').document(data['email'])
+        doc = teacher_ref.get()
+        if doc.exists:
+            teacher_ref.update(data)
+        else:
+            teacher_ref.set(data)  # Create a new document if not exists
+
+        return redirect(url_for('admin'))
     except psycopg2.Error as e:
-        print(f"Error updating teacher: {e}")
         db_connection.rollback()
-        return "Error updating teacher"
-    return redirect(url_for('admin'))
+        return f"Error updating teacher in database: {str(e)}", 500
+    except Exception as e:
+        db_connection.rollback()
+        return f"Error updating teacher in Firestore: {str(e)}", 500
+    finally:
+        if cursor:
+            cursor.close()
+
+
 
 @app.route('/delete-teacher', methods=['POST'])
 def delete_teacher():
@@ -643,8 +712,6 @@ def delete_student():
             cursor.close()
 
 
-
-
 @app.route('/allocate-course', methods=['POST'])
 def allocate_course():
     course_name = request.form['course_name']
@@ -661,6 +728,7 @@ def allocate_course():
         return "Error allocating course"
 
     return redirect(url_for('admin'))
+
 
 @app.route('/logout')
 def logout():

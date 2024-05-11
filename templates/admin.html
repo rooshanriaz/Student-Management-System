@@ -118,7 +118,6 @@
             <button class="tablinks" onclick="openTab(event, 'insert_teacher')">Insert Teacher</button>
             <button class="tablinks" onclick="openTab(event, 'update_teacher')">Update Teacher</button>
             <button class="tablinks" onclick="openTab(event, 'delete_teacher')">Delete Teacher</button>
-            <button class="tablinks" onclick="openTab(event, 'update_password')">Update Password</button>
             <button class="tablinks" onclick="openTab(event, 'allocate_courses')">Allocate Courses</button>
         </div>
 
@@ -297,27 +296,7 @@
                 <input type="submit" value="Delete">
             </form>
         </div>
-
-        <!-- Update Password -->
-        <div id="update_password" class="tabcontent">
-            <h2>Update Password</h2>
-            <form action="/update-password" method="POST">
-                <label for="role">Role (student or teacher):</label>
-                <input type="text" id="role" name="role" required>
-
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-
-                <label for="password">New Password:</label>
-                <input type="password" id="password" name="password" required>
-
-                <input type="submit" value="Update Password">
-            </form>
-        </div>
-    </div>
     
-
-
     <script>
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;

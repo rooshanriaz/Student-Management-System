@@ -90,12 +90,11 @@
 <body>
     <div class="header">
         <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
-        <button class="contact-us-button">Contact Us</button>
     </div>
 
     <div class="login-container">
         <h2>Login</h2>
-        <form id="loginForm" action="/authenticate" method="POST">
+        <form id="loginForm" action="/authenticate" method="POST" onsubmit="return validateForm()">
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required><br><br>
             
@@ -112,5 +111,21 @@
             <input type="submit" value="Login">
         </form>
     </div>
+
+    <script>
+        function validateForm() {
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            if (!email || !password) {
+                alert("Email and password must be filled out");
+                return false;
+            }
+            if (!email.includes('@')) {
+                alert("Please enter a valid email address");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </body>
 </html>

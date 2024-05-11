@@ -99,3 +99,11 @@ CREATE TABLE Admin (
     FOREIGN KEY (registration_number) REFERENCES Students(registration_number),
     FOREIGN KEY (email) REFERENCES Credentials(email)
 );
+
+ALTER TABLE Teachers ADD CONSTRAINT unique_email UNIQUE (email);
+
+
+ALTER TABLE Course ADD COLUMN teacher_email VARCHAR (100);
+
+ALTER TABLE Course
+ADD FOREIGN KEY (teacher_email) REFERENCES Teachers(email);
