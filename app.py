@@ -708,7 +708,7 @@ def setup_delete_student_trigger():
     """)
 
     conn.commit()
-    cursor.close()s
+    cursor.close()
     conn.close()
     print("DeleteStudentRegistrations trigger has been set up successfully.")
 
