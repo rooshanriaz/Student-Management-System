@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, m
 import psycopg2
 from psycopg2 import sql
 
-app = Flask(__name__)
+app = Flask(_name_)
 
 import firebase_admin
 from firebase_admin import credentials
@@ -578,41 +578,42 @@ def update_student():
         return "Error updating student"
     return redirect(url_for('admin'))
 
-# Delete student
 @app.route('/delete-student', methods=['POST'])
 def delete_student():
     email = request.form['email']
     try:
         cursor = db_connection.cursor()
-        # First, remove from Credentials
-        cursor.execute("DELETE FROM Credentials WHERE email=%s AND role='student'", (email,))
-        # Then, remove from Students
-        cursor.execute("DELETE FROM Students WHERE email=%s", (email,))
-        db_connection.commit()
-    except psycopg2.Error as e:
-        print(f"Error deleting student: {e}")
-        db_connection.rollback()
-        return "Error deleting student"
-    return redirect(url_for('admin'))
 
-# Update password for student or teacher
-@app.route('/update-password', methods=['POST'])
-def update_password():
-    role = request.form['role']  # 'student' or 'teacher'
-    email = request.form['email']
-    new_password = request.form['password']
-    try:
-        cursor = db_connection.cursor()
-        cursor.execute(
-            """UPDATE Credentials SET password=%s WHERE email=%s AND role=%s""",
-            (new_password, email, role)
-        )
+        # Start transaction
+        cursor.execute("BEGIN")
+
+        # Check if the student exists
+        cursor.execute("SELECT registration_number FROM Students WHERE email=%s", (email,))
+        student = cursor.fetchone()
+        if not student:
+            db_connection.rollback()
+            return "Student record not found", 404
+
+        registration_number = student[0]
+
+        # Delete from Registrations table first
+        cursor.execute("DELETE FROM Registrations WHERE registration_number=%s", (registration_number,))
+
+        # Delete from Students table
+        cursor.execute("DELETE FROM Students WHERE email=%s", (email,))
+
+        # Delete from Credentials table
+        cursor.execute("DELETE FROM Credentials WHERE email=%s AND role='student'", (email,))
+
+        # Commit transaction
         db_connection.commit()
+        return redirect(url_for('admin'))
     except psycopg2.Error as e:
-        print(f"Error updating password for {role}: {e}")
-        db_connection.rollback()
-        return f"Error updating password for {role}"
-    return redirect(url_for('admin'))
+        db_connection.rollback()  # Rollback in case of error
+        return f"Error deleting student: {str(e)}", 500
+    finally:
+        cursor.close()
+
 
 @app.route('/allocate-course', methods=['POST'])
 def allocate_course():
@@ -676,9 +677,44 @@ def setup_enrollment_trigger():
     print("Enrollment trigger has been set up successfully.")
 
 
+def setup_delete_student_trigger():
+    """
+    Sets up the DeleteStudentRegistrations trigger in the PostgreSQL database.
+    This trigger will automatically delete all registration entries for a student from the 
+    registrations table when that student's record is removed from the Students table.
+    """
+    conn = create_connection()
+    cursor = conn.cursor()
+    
+    # Define the function that the trigger will execute
+    cursor.execute("""
+    CREATE OR REPLACE FUNCTION delete_student_registrations()
+    RETURNS TRIGGER AS $$
+    BEGIN
+        DELETE FROM registrations
+        WHERE registration_number = OLD.registration_number;
+        RETURN OLD;
+    END;
+    $$ LANGUAGE plpgsql;
+    """)
 
-if __name__ == '__main__':
-    setup_enrollment_trigger()  # Set up the database trigger
+    # Create the trigger that invokes the above function
+    cursor.execute("""
+    DROP TRIGGER IF EXISTS DeleteStudentRegistrations ON Students;
+    CREATE TRIGGER DeleteStudentRegistrations
+    AFTER DELETE ON Students
+    FOR EACH ROW
+    EXECUTE FUNCTION delete_student_registrations();
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print("DeleteStudentRegistrations trigger has been set up successfully.")
+
+
+
+if _name_ == '_main_':
+    setup_enrollment_trigger()  # Set up the enrollment increment trigger
+    setup_delete_student_trigger()  # Set up the delete student registrations trigger
     app.run(debug=True)
-   
-
