@@ -635,7 +635,50 @@ def allocate_course():
 def logout():
     session.clear()  # Clear all session data
     return redirect(url_for('login'))
+def setup_enrollment_trigger():
+    """
+    Sets up the UpdateEnrollment trigger in the PostgreSQL database.
+    This trigger will automatically increment the students_enrolled count
+    in the Course table whenever a new entry is made in the registrations table.
+    """
+    connection = create_connection()
+    cursor = connection.cursor()
+    
+    # Define the function first before creating the trigger
+    cursor.execute("""
+    CREATE OR REPLACE FUNCTION update_enrollment()
+    RETURNS TRIGGER AS $$
+    BEGIN
+        UPDATE Course
+        SET students_enrolled = students_enrolled + 1
+        WHERE course_name = NEW.course_name;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+    """)
+
+    # Drop the existing trigger if it exists
+    cursor.execute("""
+    DROP TRIGGER IF EXISTS UpdateEnrollment ON registrations;
+    """)
+    
+    # Create the trigger using the newly defined function
+    cursor.execute("""
+    CREATE TRIGGER UpdateEnrollment
+    AFTER INSERT ON registrations
+    FOR EACH ROW
+    EXECUTE FUNCTION update_enrollment();
+    """)
+    
+    connection.commit()
+    cursor.close()
+    connection.close()
+    print("Enrollment trigger has been set up successfully.")
+
 
 
 if __name__ == '__main__':
+    setup_enrollment_trigger()  # Set up the database trigger
     app.run(debug=True)
+   
+
