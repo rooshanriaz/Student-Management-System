@@ -78,4 +78,10 @@ values ('u2022598@giki.edu.pk', 'ubaid', 'student');
 insert into students(email, registration_number, student_name, student_date_of_birth, student_cgpa, student_enrollment_year, father_name, student_cnic, student_address, student_program_name, student_attendance, student_scholarship, student_fee_status, student_status)
 values('u2022598@giki.edu.pk',2022598, 'Ubaid Nasir', '2004-01-01' ,4.00, 2022, 'Nasir Sheikh', 3520246646249, 'Lahore', 'BS in Mechanical Engineering', 80, 'No Scholarship', 'Paid', 'Active');
 
+ALTER TABLE Teachers ADD CONSTRAINT unique_email UNIQUE (email);
 
+
+ALTER TABLE Course ADD COLUMN teacher_email VARCHAR (100);
+
+ALTER TABLE Course
+ADD FOREIGN KEY (teacher_email) REFERENCES Teachers(email);
