@@ -21,7 +21,7 @@ The **Student Management System** is designed to manage student information effe
 - Add new students with personal details (name, ID, date of birth, etc.).
 - Update existing student information.
 - Delete student records.
-- View student details.
+- Viewing student details.
 - Search for students by name or ID.
 - Supports fire-base data storage for persistence.
 
